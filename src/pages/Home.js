@@ -21,11 +21,13 @@ const Home = () => {
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
+		console.log("Name:", name, "Value:", value);
 		setFormData({ ...formData, [name]: value });
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		console.log("Form data before sending:", formData);
 
 		try {
 			const response = await fetch("http://127.0.0.1:8000/process-form/", {
@@ -41,7 +43,8 @@ const Home = () => {
 			}
 
 			const result = await response.json();
-			navigate("/resultpage", { state: { result } }); // Updated method
+			console.log("Result from backend:", result);
+			navigate("/resultpage", { state: { result } });
 		} catch (error) {
 			console.error("Error submitting form:", error);
 		}
