@@ -74,6 +74,14 @@
         button:hover {
             background-color: #45a049;
         }
+        #factBox {
+            background-color: #f0f8ff;
+            border: 1px solid #b0d4ff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 20px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -84,6 +92,8 @@
             <span class="progress-bar-fill" style="width: 0%;"></span>
         </div>
         
+        <div id="factBox"></div>
+
         <form id="projectSuggestionForm">
             <div id="section1" class="section active">
                 <h2>Personal Information</h2>
@@ -186,8 +196,9 @@
             updateProgressBar();
         }
 
-        function nextSection(current) {
+        async function nextSection(current) {
             if (current < totalSections) {
+                await displayFact(current);
                 showSection(current + 1);
             }
         }
@@ -196,6 +207,33 @@
             if (current > 1) {
                 showSection(current - 1);
             }
+        }
+
+        async function displayFact(sectionNumber) {
+            const fact = await getFact(sectionNumber);
+            const factBox = document.getElementById('factBox');
+            factBox.textContent = fact;
+            factBox.style.display = 'block';
+            
+            // Hide the fact after 5 seconds
+            setTimeout(() => {
+                factBox.style.display = 'none';
+            }, 5000);
+        }
+
+        async function getFact(sectionNumber) {
+            // This is a placeholder function. Replace this with your actual LLM API call.
+            // For now, we'll return hardcoded facts based on the section number.
+            const facts = [
+                "Did you know? The first computer programmer was a woman named Ada Lovelace!",
+                "Fun fact: Python was named after Monty Python, not the snake!",
+                "Joke time: Why do programmers prefer dark mode? Because light attracts bugs!"
+            ];
+            
+            // Simulating API delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            return facts[sectionNumber - 1] || "Thanks for completing this section!";
         }
 
         document.getElementById('projectSuggestionForm').addEventListener('submit', function(e) {
