@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Suggestion System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.3/dist/index.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -74,7 +75,7 @@
         button:hover {
             background-color: #45a049;
         }
-        #factBox {
+        #factBox, #resultBox {
             background-color: #f0f8ff;
             border: 1px solid #b0d4ff;
             border-radius: 5px;
@@ -82,10 +83,24 @@
             margin-top: 20px;
             display: none;
         }
+        #apiKeyBox {
+            background-color: #f0f8ff;
+            border: 1px solid #b0d4ff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div id="apiKeyBox">
+            <label for="apiKey">Enter Gemini API Key:</label>
+            <input type="text" id="apiKey" placeholder="Enter your API key here">
+            <button onclick="saveApiKey()">Save Key</button>
+        </div>
+
         <h1>Project Suggestion System</h1>
         
         <div class="progress-bar">
@@ -176,11 +191,21 @@
                 <button type="submit">Submit</button>
             </div>
         </form>
+
+        <div id="resultBox"></div>
+        <button id="exportButton" style="display: none;" onclick="exportResults()">Export Results</button>
     </div>
 
     <script>
         const totalSections = 3;
         let currentSection = 1;
+        let apiKey = '';
+        let projectSuggestions = '';
+
+        function saveApiKey() {
+            apiKey = document.getElementById('apiKey').value;
+            alert('API Key saved!');
+        }
 
         function updateProgressBar() {
             const progress = (currentSection - 1) / totalSections * 100;
@@ -215,32 +240,71 @@
             factBox.textContent = fact;
             factBox.style.display = 'block';
             
-            // Hide the fact after 5 seconds
             setTimeout(() => {
                 factBox.style.display = 'none';
             }, 5000);
         }
 
         async function getFact(sectionNumber) {
-            // This is a placeholder function. Replace this with your actual LLM API call.
-            // For now, we'll return hardcoded facts based on the section number.
-            const facts = [
-                "Did you know? The first computer programmer was a woman named Ada Lovelace!",
-                "Fun fact: Python was named after Monty Python, not the snake!",
-                "Joke time: Why do programmers prefer dark mode? Because light attracts bugs!"
-            ];
-            
-            // Simulating API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            return facts[sectionNumber - 1] || "Thanks for completing this section!";
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+
+            const prompt = `Generate a fun fact or joke related to section ${sectionNumber} of a project suggestion form for computer science students.`;
+
+            try {
+                const result = await model.generateContent(prompt);
+                return result.response.text();
+            } catch (error) {
+                console.error('Error fetching fact:', error);
+                return "Oops! I couldn't come up with a fact right now. Let's continue with the form!";
+            }
         }
 
-        document.getElementById('projectSuggestionForm').addEventListener('submit', function(e) {
+        async function generateProjectSuggestions(formData) {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+
+            const prompt = `You are an expert and experienced project suggestion system. Based on the following student information, suggest different projects. Provide details like project name, description, and tech stack:
+
+            ${JSON.stringify(formData, null, 2)}
+
+            Please suggest 3 different projects suitable for this student.`;
+
+            try {
+                const result = await model.generateContent(prompt);
+                return result.response.text();
+            } catch (error) {
+                console.error('Error generating project suggestions:', error);
+                return "Sorry, I couldn't generate project suggestions at this time. Please try again later.";
+            }
+        }
+
+        document.getElementById('projectSuggestionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            alert('Form submitted! In a real application, this data would be sent to a server for processing.');
-            // Here you would typically send the form data to a server
+            const formData = new FormData(e.target);
+            const formObject = Object.fromEntries(formData.entries());
+            
+            const resultBox = document.getElementById('resultBox');
+            resultBox.textContent = 'Generating project suggestions...';
+            resultBox.style.display = 'block';
+
+            projectSuggestions = await generateProjectSuggestions(formObject);
+            resultBox.textContent = projectSuggestions;
+            
+            document.getElementById('exportButton').style.display = 'block';
         });
+
+        function exportResults() {
+            const blob = new Blob([projectSuggestions], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'project_suggestions.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html>
