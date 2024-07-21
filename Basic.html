@@ -91,16 +91,22 @@
             margin-bottom: 20px;
             text-align: center;
         }
+        #apiKeyError {
+            color: red;
+            display: none;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
         <div id="apiKeyBox">
             <label for="apiKey">Enter Gemini API Key:</label>
             <input type="text" id="apiKey" placeholder="Enter your API key here">
-            <button onclick="saveApiKey()">Save Key</button>
+            <button onclick="setApiKey()">Set Key</button>
+            <div id="apiKeyError"></div>
         </div>
-
         <h1>Project Suggestion System</h1>
         
         <div class="progress-bar">
@@ -195,11 +201,41 @@
         <div id="resultBox"></div>
         <button id="exportButton" style="display: none;" onclick="exportResults()">Export Results</button>
     </div>
-
+    </div>
     <script>
+        let apiKey = '';
+        async function setApiKey() {
+            const inputKey = document.getElementById('apiKey').value.trim();
+            if (!inputKey) {
+                showApiKeyError("Please enter an API key.");
+                return;
+            }
+
+            try {
+                const genAI = new GoogleGenerativeAI(inputKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+                
+                // Attempt to generate a simple response to validate the key
+                await model.generateContent("Hello");
+                
+                // If we reach here, the key is valid
+                apiKey = inputKey;
+                document.getElementById('apiKeyBox').style.display = 'none';
+                alert('API Key set successfully!');
+            } catch (error) {
+                showApiKeyError("Invalid API key. Please try again.");
+                console.error('API Key validation error:', error);
+            }
+        }
+
+        function showApiKeyError(message) {
+            const errorDiv = document.getElementById('apiKeyError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
         const totalSections = 3;
         let currentSection = 1;
-        let apiKey = '';
         let projectSuggestions = '';
 
         function saveApiKey() {
