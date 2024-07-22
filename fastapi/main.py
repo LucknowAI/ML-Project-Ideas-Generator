@@ -28,9 +28,24 @@ class FormData(BaseModel):
     projectDescription: str
 
 
+level = {"1": "Beginner", "2": "Intermediate", "3": "Advanced"}
+course = {
+    "ai": "Artificial Intelligence",
+    "webApp": "Web Application",
+    "mobile": "Mobile App Development",
+    "dataScience": "Data Science",
+    "security": "Cyber Security",
+}
+
+
 @app.post("/process-form/")
 async def process_form(data: FormData):
     # Process the data (e.g., save to database, perform analysis)
     # For simplicity, we'll just return the received data
+    data.python = level[data.python]
+    data.java = level[data.java]
+    data.webdev = level[data.webdev]
+    data.ml = level[data.ml]
+    data.projectArea = course[data.projectArea]
     print(data)
     return data
