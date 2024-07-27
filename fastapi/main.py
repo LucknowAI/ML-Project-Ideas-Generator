@@ -1,7 +1,12 @@
 from fastapi import FastAPI, Form
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.output_parsers.string import StrOutputParser
+
+
 from typing import Optional
+from wp import Wrap
 
 app = FastAPI()
 
@@ -13,6 +18,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+llm = Wrap()
 
 
 class FormData(BaseModel):
@@ -47,5 +54,19 @@ async def process_form(data: FormData):
     data.webdev = level[data.webdev]
     data.ml = level[data.ml]
     data.projectArea = course[data.projectArea]
+    output = llm.generate_text(
+        {
+            "name": data.name,
+            "year": data.year,
+            "university": data.university,
+            "python": data.python,
+            "java": data.java,
+            "webdev": data.webdev,
+            "ml": data.ml,
+            "projectType": data.projectType,
+            "projectArea": data.projectArea,
+            "projectDescription": data.projectDescription,
+        },
+    )
     print(data)
-    return data
+    return output
