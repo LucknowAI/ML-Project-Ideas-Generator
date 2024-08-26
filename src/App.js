@@ -1,14 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import Home from './pages/Home';
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import ResultPage from "./pages/ResultPage";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <Home />
-    </div>
-  );
-}
+const App = () => {
+	return (
+		<div className="App">
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route path="/result" element={<ResultPage />} />
+			</Routes>
+		</div>
+	);
+};
 
 export default App;
