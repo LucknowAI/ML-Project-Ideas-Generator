@@ -118,6 +118,7 @@ const Home = () => {
 			navigate("/result", { state: { result } });
 		} catch (error) {
 			console.error("Error:", error);
+			navigate("/result", { state: { error } });
 		}
 	};
 	const renderPage = () => {
@@ -637,12 +638,18 @@ const Home = () => {
 								label="Preferred Approach to Challenging Tasks:"
 								name="challengingTasks"
 								options={[
-									{ value: "breakDown", label: "Break it into smaller parts" },
 									{
-										value: "tackleFirst",
+										value: "Break it into smaller parts",
+										label: "Break it into smaller parts",
+									},
+									{
+										value: "Tackle the most difficult aspect first",
 										label: "Tackle the most difficult aspect first",
 									},
-									{ value: "seekHelp", label: "Seek help or collaboration" },
+									{
+										value: "Tackle the most difficult aspect first",
+										label: "Tackle the most difficult aspect first",
+									},
 								]}
 								value={formData.challengingTasks}
 								onChange={handleSelectChange}
@@ -652,10 +659,13 @@ const Home = () => {
 								label="Preferred Learning Method:"
 								name="learningMethod"
 								options={[
-									{ value: "handsOn", label: "Hands-on experimentation" },
-									{ value: "theoryFirst", label: "Study theory first" },
 									{
-										value: "discussion",
+										value: "Hands-on experimentation",
+										label: "Hands-on experimentation",
+									},
+									{ value: "Study theory first", label: "Study theory first" },
+									{
+										value: "Discussion and collaboration",
 										label: "Discussion and collaboration",
 									},
 								]}
