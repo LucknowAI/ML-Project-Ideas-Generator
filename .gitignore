@@ -2,3 +2,7 @@ node_modules/
 __pycache__/
 .env
 
+
+.gitignore
+package.json
+  

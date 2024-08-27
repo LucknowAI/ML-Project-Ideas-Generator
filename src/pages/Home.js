@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputField from "../components/form/InputField";
 import SelectField from "../components/form/SelectField";
 import RadioGroup from "../components/form/RadioGroup";
 import TextAreaField from "../components/form/TextAreaField";
 import ChecklistGroup from "../components/form/CheckListGroup";
 import ProgressBar from "../components/form/ProgressBar";
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
@@ -65,9 +66,16 @@ const Home = () => {
 		inspiringCourses: "",
 		emergingTech: "",
 	});
+	const formDataKeys = Object.keys(formData);
 	const navigate = useNavigate();
 	const totalPages = 7;
 
+	useEffect(() => {
+		const formData = Cookies.get("formData");
+		if (formData) {
+			setFormData(JSON.parse(formData));
+		}
+	}, []);
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
 		setFormData((prevState) => ({
@@ -102,6 +110,18 @@ const Home = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		let isValid = true;
+
+		formDataKeys.forEach((key) => {
+			if (!formData[key]) {
+				isValid = false;
+				return;
+			}
+		});
+		if (!isValid) {
+			alert("Please fill out all fields before submitting");
+			return;
+		}
 		try {
 			const response = await fetch("http://localhost:8000/process-form", {
 				method: "POST",
@@ -110,6 +130,7 @@ const Home = () => {
 				},
 				body: JSON.stringify(formData),
 			});
+			Cookies.set("formData", JSON.stringify(formData));
 			if (!response.ok) {
 				throw new Error("Network response was not ok");
 			}
@@ -137,7 +158,7 @@ const Home = () => {
 							placeholder="Enter your API key"
 							value={formData.key}
 							onChange={handleInputChange}
-							required
+							required={true}
 						/>
 						<h2 className="text-xl font-semibold mb-4 text-left">
 							Personal Information

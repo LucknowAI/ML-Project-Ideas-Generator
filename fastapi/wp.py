@@ -10,25 +10,9 @@ load_dotenv()
 
 class Wrap:
     def __init__(self, api_key=None):
-        api_key = api_key or os.getenv("GOOGLE_API_KEY")
+        api_key = api_key
         llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=api_key)
-        self.chain = (
-            prompt_template
-            # {
-            #     "name": itemgetter("name"),
-            #     "year": itemgetter("year"),
-            #     "university": itemgetter("university"),
-            #     "python": itemgetter("python"),
-            #     "java": itemgetter("java"),
-            #     "webdev": itemgetter("webdev"),
-            #     "ml": itemgetter("ml"),
-            #     "projectType": itemgetter("projectType"),
-            #     "projectArea": itemgetter("projectArea"),
-            #     "projectDescription": itemgetter("projectDescription"),
-            # }
-            | llm
-            | StrOutputParser()
-        )
+        self.chain = prompt_template | llm | StrOutputParser()
 
     def generate_text(self, prompt):
         return self.chain.invoke(prompt)
