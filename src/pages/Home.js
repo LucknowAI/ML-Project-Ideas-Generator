@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputField from "../components/form/InputField";
 import SelectField from "../components/form/SelectField";
 import RadioGroup from "../components/form/RadioGroup";
 import TextAreaField from "../components/form/TextAreaField";
 import ChecklistGroup from "../components/form/CheckListGroup";
 import ProgressBar from "../components/form/ProgressBar";
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
@@ -69,6 +70,12 @@ const Home = () => {
 	const navigate = useNavigate();
 	const totalPages = 7;
 
+	useEffect(() => {
+		const formData = Cookies.get("formData");
+		if (formData) {
+			setFormData(JSON.parse(formData));
+		}
+	}, []);
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
 		setFormData((prevState) => ({
@@ -123,6 +130,7 @@ const Home = () => {
 				},
 				body: JSON.stringify(formData),
 			});
+			Cookies.set("formData", JSON.stringify(formData));
 			if (!response.ok) {
 				throw new Error("Network response was not ok");
 			}
