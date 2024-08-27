@@ -65,6 +65,7 @@ const Home = () => {
 		inspiringCourses: "",
 		emergingTech: "",
 	});
+	const formDataKeys = Object.keys(formData);
 	const navigate = useNavigate();
 	const totalPages = 7;
 
@@ -102,6 +103,18 @@ const Home = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		let isValid = true;
+
+		formDataKeys.forEach((key) => {
+			if (!formData[key]) {
+				isValid = false;
+				return;
+			}
+		});
+		if (!isValid) {
+			alert("Please fill out all fields before submitting");
+			return;
+		}
 		try {
 			const response = await fetch("http://localhost:8000/process-form", {
 				method: "POST",
@@ -137,7 +150,7 @@ const Home = () => {
 							placeholder="Enter your API key"
 							value={formData.key}
 							onChange={handleInputChange}
-							required
+							required={true}
 						/>
 						<h2 className="text-xl font-semibold mb-4 text-left">
 							Personal Information

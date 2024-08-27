@@ -10,7 +10,7 @@ load_dotenv()
 
 class Wrap:
     def __init__(self, api_key=None):
-        api_key = api_key or os.getenv("GOOGLE_API_KEY")
+        api_key = api_key
         llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=api_key)
         self.chain = prompt_template | llm | StrOutputParser()
 
