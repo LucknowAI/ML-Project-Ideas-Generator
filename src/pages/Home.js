@@ -123,7 +123,7 @@ const Home = () => {
 			return;
 		}
 		try {
-			const response = await fetch("http://localhost:8000/process-form", {
+			const response = await fetch("http://localhost:5000/process-form", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

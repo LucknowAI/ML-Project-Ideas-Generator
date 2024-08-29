@@ -3,8 +3,7 @@ from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers.string import StrOutputParser
-
-
+import uvicorn
 from typing import Optional, List
 from wp import Wrap
 
@@ -88,6 +87,12 @@ course = {
     "security": "Cyber Security",
 }
 
+port = 5000
+
+
+async def startup_event():
+    print(f"Server started at http://localhost:{port}")
+
 
 @app.post("/process-form/")
 async def process_form(data: FormData):
@@ -162,3 +167,7 @@ async def process_form(data: FormData):
         return output
     except Exception as e:
         return {"error": str(e)}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=port)
